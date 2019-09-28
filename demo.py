@@ -23,7 +23,23 @@ def read_binary_stl(filename):
 
     return {'vertices': points, 'indices': indices}
 
+# Testing AABB Set
 
+aabb_set = gimpact.AABBSet(10)
+print(len(aabb_set))
+print(aabb_set.global_bound)
+for i in range(len(aabb_set)):
+    aabb_set[i] = (0., 0., 0., 0., 0., 0.)
+
+for aabb in aabb_set:
+    print(aabb)
+
+print('\n')
+print(aabb_set.global_bound)
+pairs = aabb_set.find_intersections(aabb_set)
+print(pairs)
+
+# Testing Trimesh Class
 
 mesh = read_binary_stl(r'C:\Users\Stephen\Documents\RB1910414\M14\M14.stl')
 trimesh = gimpact.TriMesh(mesh['vertices'], mesh['indices'])

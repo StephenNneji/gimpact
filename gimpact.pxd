@@ -71,10 +71,38 @@ cdef extern from "GIMPACT/gim_memory.h":
 
 
 cdef extern from "GIMPACT/gim_boxpruning.h":
-    cdef struct GIM_AABB_SET:
+    cdef struct aabb3f:
+        GREAL 	minX
+        GREAL 	maxX
+        GREAL 	minY
+        GREAL 	maxY
+        GREAL 	minZ
+        GREAL 	maxZ
+
+    struct GIM_RSORT_TOKEN:
         pass
+
+    cdef struct GIM_AABB_SET:
+        GUINT32 m_count
+        aabb3f m_global_bound
+        aabb3f * m_boxes
+        GUINT32 * m_maxcoords
+        GIM_RSORT_TOKEN * m_sorted_mincoords;
+        char m_shared;
     
+    cdef struct GIM_PAIR:
+        GUINT32 m_index1
+        GUINT32 m_index2
+
+    void gim_aabbset_alloc(GIM_AABB_SET * aabbset, GUINT32 count)
+    
+    void gim_aabbset_destroy(GIM_AABB_SET * aabbset)
+
+    void gim_aabbset_update(GIM_AABB_SET * aabbset) 	
+
     void gim_aabbset_bipartite_intersections(GIM_AABB_SET * aabbset1, GIM_AABB_SET * aabbset2, GDYNAMIC_ARRAY * collision_pairs)
+    
+    void GIM_CREATE_PAIR_SET(GDYNAMIC_ARRAY pair_array)
 
 
 cdef extern from "GIMPACT/gim_tri_capsule_collision.h":
@@ -122,4 +150,3 @@ cdef extern from "GIMPACT/gim_trimesh.h":
     int gim_trimesh_ray_collision(GIM_TRIMESH * trimesh,vec3f origin,vec3f dir, GREAL tmax, GIM_TRIANGLE_RAY_CONTACT_DATA * contact)
     
     int gim_trimesh_ray_closest_collision(GIM_TRIMESH * trimesh,vec3f origin,vec3f dir, GREAL tmax, GIM_TRIANGLE_RAY_CONTACT_DATA * contact)
-

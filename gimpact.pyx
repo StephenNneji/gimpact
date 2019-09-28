@@ -5,6 +5,68 @@ import numpy as np
 
 cdef object __create_uninitialized__ = object()
 
+cdef class AABBSet:
+    """AABB Set object."""
+
+    cdef GIM_AABB_SET _aabb_set
+    
+    def __cinit__(self, int count):
+        gim_aabbset_alloc(&self._aabb_set, count)	
+
+    def __dealloc__(self):
+        gim_aabbset_destroy(&self._aabb_set)
+
+    def __getitem__(self, index):
+        if index < 0 or index >= self._aabb_set.m_count:
+            raise IndexError('AABBSet index out of range')
+
+        return AABBSet.aabb3f_to_tuple(self._aabb_set.m_boxes[index])
+
+    def __setitem__(self, index, bounds):
+        if index < 0 or index >= self._aabb_set.m_count:
+            raise IndexError('AABBSet index out of range')
+
+        self._aabb_set.m_boxes[index].minX = bounds[0]
+        self._aabb_set.m_boxes[index].maxX = bounds[1]
+        self._aabb_set.m_boxes[index].minY = bounds[2]
+        self._aabb_set.m_boxes[index].maxY = bounds[3]
+        self._aabb_set.m_boxes[index].minZ = bounds[4]
+        self._aabb_set.m_boxes[index].maxZ = bounds[5]
+
+    @property
+    def global_bound(self):
+        gim_aabbset_update(&self._aabb_set) 
+        return AABBSet.aabb3f_to_tuple(self._aabb_set.m_global_bound)
+
+    def find_intersections(self, aabb_set):
+        cdef GDYNAMIC_ARRAY gim_pairs
+        GIM_CREATE_PAIR_SET(gim_pairs)
+
+        cdef object id = aabb_set._id()
+        
+        gim_aabbset_bipartite_intersections(&self._aabb_set, <GIM_AABB_SET*>PyLong_AsVoidPtr(id), &gim_pairs)
+        pairs = []
+        
+        cdef int count = gim_pairs.m_size
+        cdef GIM_PAIR* data = <GIM_PAIR*>gim_pairs.m_pdata 
+        
+        for pair in data[:count]:
+            pairs.append((pair.m_index1, pair.m_index2))
+        
+        GIM_DYNARRAY_DESTROY(gim_pairs)
+
+        return pairs
+
+    def __len__(self):
+        return self._aabb_set.m_count
+
+    @staticmethod
+    cdef aabb3f_to_tuple(aabb3f aabb):
+        return (aabb.minX, aabb.maxX, aabb.minY, aabb.maxY, aabb.minZ, aabb.maxZ)
+    
+    def _id(self):
+        return PyLong_FromVoidPtr(<void*>&self._aabb_set)
+
 
 cdef class TriMesh:
     """TriMesh object."""
@@ -51,7 +113,6 @@ cdef class TriMesh:
         trimesh.buffer_managers = buffer_managers
         
         return trimesh
-
     
     def getTriangleCount(self):
         """getTriangleCount() -> n
