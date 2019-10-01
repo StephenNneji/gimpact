@@ -32,6 +32,7 @@ cdef class AABBSet:
         self._aabb_set.m_boxes[index].maxY = bounds[3]
         self._aabb_set.m_boxes[index].minZ = bounds[4]
         self._aabb_set.m_boxes[index].maxZ = bounds[5]
+        gim_aabbset_update(&self._aabb_set)
 
     @property
     def global_bound(self):

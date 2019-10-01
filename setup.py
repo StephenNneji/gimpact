@@ -5,11 +5,12 @@ import numpy
 
 modules = Extension(
     name="gimpact",
-    sources=["gimpact.pyx"],
+    sources=["gimpact.pyx", "GIMPACT/src/gimpact.cpp", "GIMPACT/src/gim_contact.cpp", "GIMPACT/src/gim_math.cpp", 
+             "GIMPACT/src/gim_boxpruning.cpp", "GIMPACT/src/gim_memory.cpp","GIMPACT/src/gim_tri_tri_overlap.cpp",
+             "GIMPACT/src/gim_trimesh.cpp","GIMPACT/src/gim_trimesh_capsule_collision.cpp", "GIMPACT/src/gim_trimesh_ray_collision.cpp",
+             "GIMPACT/src/gim_trimesh_sphere_collision.cpp", "GIMPACT/src/gim_trimesh_trimesh_collision.cpp"],
     language="c++",
-    library_dirs = [r"D:\Software Libraries\GIMPACT\build\x64\Release"],
-    libraries=["GIMPACT"],
-    include_dirs=[r"D:\Software Libraries\GIMPACT\include", numpy.get_include()],
+    include_dirs=["GIMPACT/include", numpy.get_include()],
 )
 setup(
     name="gimpact",

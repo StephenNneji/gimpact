@@ -41,7 +41,7 @@ print(pairs)
 
 # Testing Trimesh Class
 
-mesh = read_binary_stl(r'C:\Users\Stephen\Documents\RB1910414\M14\M14.stl')
+mesh = read_binary_stl(r'D:\Experiments\RB1910414\M14\M14.stl')
 trimesh = gimpact.TriMesh(mesh['vertices'], mesh['indices'])
 v = mesh['vertices']
 print(trimesh.getTriangleCount())
