@@ -77,12 +77,12 @@ contacts = gimpact.trimesh_plane_collision(trimesh1, np.array([0., 0., 0., 0.], 
 for c in contacts:
    print(*c)
 
-contact = gimpact.trimesh_ray_collision(trimesh2, np.array([0., 0., 0.]), np.array([-1., 0., 0.], np.float32), 1000)
+contact = gimpact.trimesh_ray_collision(trimesh2, np.array([0., 0., 0.], np.float32), np.array([-1., 0., 0.], np.float32), 1000)
 print('\n', contact)
 
 
 contact = gimpact.trimesh_ray_closest_collision(trimesh2, np.array([0., 0., 0.], np.float32), np.array([-1., 0., 0.], np.float32), 1000)
 print('\n', contact)
 
-t = trimesh.copy()
+t = trimesh.clone()
 print(t.getTriangleCount())

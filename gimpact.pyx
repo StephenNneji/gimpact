@@ -6,7 +6,11 @@ import numpy as np
 cdef object __create_uninitialized__ = object()
 
 cdef class AABBSet:
-    """AABB Set object."""
+    """Represents a collection of axis-aligned bounding boxes (AABBs)
+    
+    :param count: number of bounding box
+    :type count: int
+    """
 
     cdef GIM_AABB_SET _aabb_set
     
@@ -36,10 +40,25 @@ cdef class AABBSet:
 
     @property
     def global_bound(self):
+        """Gets an AABB bounding the entire collection
+
+        :return: bounds of AABB (min X, max X, min Y, max Y, min Z, max Z)
+        :rtype: Tuple[float, float, float, float, float, float]
+        """
+        
         gim_aabbset_update(&self._aabb_set) 
         return AABBSet.aabb3f_to_tuple(self._aabb_set.m_global_bound)
 
     def find_intersections(self, aabb_set):
+        """Finds all intersections between this AABBs of this 
+        AABBSet and those of another.
+
+        :param aabb_set: the other AABBSet
+        :type aabb_set: AABBSet
+        :return: A list of intersecting index pairs
+        :rtype: List[Tuple[int]]
+        """
+        
         cdef GDYNAMIC_ARRAY gim_pairs
         GIM_CREATE_PAIR_SET(gim_pairs)
 
@@ -70,7 +89,15 @@ cdef class AABBSet:
 
 
 cdef class TriMesh:
-    """TriMesh object."""
+    """Represents a triangle mesh
+    
+    :param vertices: array of 3D vertices
+    :type vertices: Array[float]
+    :param indices: array of indices
+    :type indices: Array[int]
+    :param copy: indicates that data should be copied
+    :type copy: bool
+    """
 
     cdef GIM_TRIMESH _trimesh
     cdef GBUFFER_MANAGER_DATA buffer_managers[G_BUFFER_MANAGER__MAX]
@@ -103,7 +130,12 @@ cdef class TriMesh:
         gim_trimesh_set_tranform(&self._trimesh, <mat4f>&matrix[0, 0])
         gim_trimesh_update(&self._trimesh)
     
-    def copy(self):
+    def clone(self):
+        """Returns a  clone of the trimesh.
+        
+        :return: trimesh clone
+        :rtype: Trimesh
+        """
         cdef GIM_TRIMESH dest_trimesh
         cdef GBUFFER_MANAGER_DATA buffer_managers[G_BUFFER_MANAGER__MAX]
         gim_init_buffer_managers(buffer_managers)
@@ -116,17 +148,21 @@ cdef class TriMesh:
         return trimesh
     
     def getTriangleCount(self):
-        """getTriangleCount() -> n
-
-        Returns the number of triangles in the TriMesh."""
+        """Returns the number of triangles in the TriMesh.
+        
+        :return: the number of triangles in the TriMesh
+        :rtype: int
+        """
 
         return gim_trimesh_get_triangle_count(&self._trimesh)
 
     def getTriangle(self, int idx):
-        """getTriangle(idx) -> (v0, v1, v2)
+        """returns vertices of the triangle with specified index
 
-        @param idx: Triangle index
-        @type idx: int
+        :param idx: triangle index
+        :type idx: int
+        :return: vertices of triangle with specified index
+        :rtype: Tuple[Tuple[float, float, float]]
         """
         cdef vec3f v0 = [0., 0., 0.]
         cdef vec3f v1 = [0., 0., 0.]
@@ -145,6 +181,16 @@ cdef class TriMesh:
 
 
 def trimesh_trimesh_collision(trimesh1, trimesh2):
+    """Determines contacts of a trimesh-trimesh collision
+    
+    :param trimesh1: first triangle mesh
+    :type trimesh1: Trimesh
+    :param trimesh2: second triangle mesh
+    :type trimesh2: Trimesh
+    :return: a list of Contacts
+    :rtype: List[Contact]
+    """
+    
     cdef GDYNAMIC_ARRAY gim_contacts
     GIM_CREATE_CONTACT_LIST(gim_contacts)
 
@@ -156,6 +202,17 @@ def trimesh_trimesh_collision(trimesh1, trimesh2):
 
 
 def trimesh_sphere_collision(trimesh, float[::1] center, float radius):
+    """Determines contacts of a trimesh-sphere collision
+    
+    :param trimesh: triangle mesh
+    :type trimesh: Trimesh
+    :param center: center of the sphere
+    :type center: Array[float]
+    :param radius: radius of the sphere
+    :type radius: float
+    :return: a list of Contacts
+    :rtype: List[Contact]
+    """
     cdef GDYNAMIC_ARRAY gim_contacts
     GIM_CREATE_CONTACT_LIST(gim_contacts)
 
@@ -166,6 +223,16 @@ def trimesh_sphere_collision(trimesh, float[::1] center, float radius):
 
 
 def trimesh_plane_collision(trimesh, float[::1] plane):
+    """Determines contacts of a trimesh-plane collision
+    
+    :param trimesh: triangle mesh
+    :type trimesh: Trimesh
+    :param plane: plane parameters (a, b, c, d) in form of ax + by + cz + d = 0
+    :type plane: Array[float]
+    :return: a list of tuples containing point and penetration depth
+    :rtype: List[Tuple[Array[float], float]]
+    """
+    
     cdef GDYNAMIC_ARRAY gim_contacts
     GIM_CREATE_TRIMESHPLANE_CONTACTS(gim_contacts)
 
@@ -187,6 +254,19 @@ def trimesh_plane_collision(trimesh, float[::1] plane):
 
 
 def trimesh_capsule_collision(trimesh, float[::1] point1, float[::1] point2, float radius):
+    """Determines contacts of a trimesh-capsule collision
+    
+    :param trimesh: triangle mesh
+    :type trimesh: Trimesh
+    :param point1: first end-point of the capsule
+    :type point1: Array[float]
+    :param point2: second end-point of the capsule
+    :type point2: Array[float]
+    :param radius: radius of the sphere
+    :type radius: float
+    :return: a list of Contacts
+    :rtype: List[Contact]
+    """
     cdef GDYNAMIC_ARRAY gim_contacts
     GIM_CREATE_CONTACT_LIST(gim_contacts)
 
@@ -202,6 +282,20 @@ def trimesh_capsule_collision(trimesh, float[::1] point1, float[::1] point2, flo
 
 
 def trimesh_ray_collision(trimesh, float[::1] origin, float[::1] direction, float tmax):
+    """Determines contact of a trimesh-ray collision
+    
+    :param trimesh: triangle mesh
+    :type trimesh: Trimesh
+    :param origin: origin point of ray
+    :type origin: Array[float]
+    :param direction: direction vector of ray
+    :type direction: Array[float]
+    :param tmax: max distance param for ray.
+    :type tmax: float
+    :return: random contact if ray collides else None
+    :rtype: Union[Contact, None]
+    """
+
     cdef GIM_TRIANGLE_RAY_CONTACT_DATA gim_contact
     intersect = gim_trimesh_ray_collision(<GIM_TRIMESH*>PyLong_AsVoidPtr(trimesh._id()),
                                           <vec3f>&origin[0], <vec3f>&direction[0], tmax, &gim_contact)
@@ -213,6 +307,20 @@ def trimesh_ray_collision(trimesh, float[::1] origin, float[::1] direction, floa
 
 
 def trimesh_ray_closest_collision(trimesh, float[::1] origin, float[::1] direction, float tmax):
+    """Determines closest contact of a trimesh-ray collision
+    
+    :param trimesh: triangle mesh
+    :type trimesh: Trimesh
+    :param origin: origin point of ray
+    :type origin: Array[float]
+    :param direction: direction vector of ray
+    :type direction: Array[float]
+    :param tmax: max distance param for ray.
+    :type tmax: float
+    :return: closest contact if ray collides else None
+    :rtype: Union[Contact, None]
+    """
+    
     cdef GIM_TRIANGLE_RAY_CONTACT_DATA gim_contact
     intersect = gim_trimesh_ray_closest_collision(<GIM_TRIMESH*>PyLong_AsVoidPtr(trimesh._id()),
                                                   <vec3f>&origin[0], <vec3f>&direction[0], tmax, &gim_contact)
@@ -240,6 +348,19 @@ cdef extract_contact_data(GDYNAMIC_ARRAY  gim_contacts):
 
 
 class Contact:
+    """Represents a collision contact
+    
+    :param point: intersection point
+    :type point: Array[float]
+    :param normal: friction direction
+    :type normal: Array[float]
+    :param depth: peneration depth
+    :type depth: float
+    :param feature1: index of colliding triangle in first mesh.
+    :type feature1: int
+    :param feature2: index of colliding triangle in second mesh.
+    :type feature2: int
+    """
     def __init__(self, point, normal, depth, feature1, feature2):
         self.point = point
         self.normal = normal

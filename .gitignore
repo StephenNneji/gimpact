@@ -14,7 +14,8 @@ htmlcov/
 
 # Build
 build
-docs/
+_build
+docs/generated
 
 # Cythonize output
 gimpact.cpp
