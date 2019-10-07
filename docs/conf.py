@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'GImpact Python Extension'
+project = 'GImpact-Python'
 import datetime
 copyright = u'2019-{}, Stephen Nneji'.format(datetime.date.today().year)
 author = 'Stephen Nneji'
@@ -184,7 +184,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'gimpect.tex', 'GImpact Python Extension Documentation',
+    (master_doc, 'gimpect.tex', 'GImpact-Python Documentation',
      'Stephen Nneji', 'manual'),
 ]
 
@@ -194,7 +194,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'GImpact Python Extension', 'GImpact Python Extension Documentation',
+    (master_doc, 'GImpact-Python', 'GImpact-Python Documentation',
      [author], 1)
 ]
 
@@ -205,8 +205,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'GImpact Python Extension', 'GImpact Python Extension Documentation',
-     author, 'GImpact Python Extension', 'One line description of project.',
+    (master_doc, 'GImpact-Python', 'GImpact-Python Documentation',
+     author, 'GImpact-Python', 'One line description of project.',
      'Miscellaneous'),
 ]
 

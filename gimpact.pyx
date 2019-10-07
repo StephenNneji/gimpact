@@ -14,7 +14,10 @@ cdef class AABBSet:
 
     cdef GIM_AABB_SET _aabb_set
     
-    def __cinit__(self, int count):
+    def __cinit__(self, int count, flag=None):
+        if flag is __create_uninitialized__:
+            return
+
         gim_aabbset_alloc(&self._aabb_set, count)	
 
     def __dealloc__(self):
@@ -39,7 +42,7 @@ cdef class AABBSet:
         gim_aabbset_update(&self._aabb_set)
 
     @property
-    def global_bound(self):
+    def global_bounds(self):
         """Gets an AABB bounding the entire collection
 
         :return: bounds of AABB (min X, max X, min Y, max Y, min Z, max Z)
@@ -101,6 +104,7 @@ cdef class TriMesh:
 
     cdef GIM_TRIMESH _trimesh
     cdef GBUFFER_MANAGER_DATA buffer_managers[G_BUFFER_MANAGER__MAX]
+    cdef object _aabb_set
     
     def __cinit__(self, float[:, ::1] vertices, int[::1] indices, copy=True, flag=None):
         if flag is __create_uninitialized__:
@@ -119,6 +123,8 @@ cdef class TriMesh:
                                      vertices.shape[0], _copy, <GUINT32*>&indices[0], indices.size, _copy, 1)
         gim_trimesh_update(&self._trimesh)
 
+        self._aabb_set = None
+
     def __dealloc__(self):
         gim_trimesh_destroy(&self._trimesh)
         gim_terminate_buffer_managers(self.buffer_managers)
@@ -129,7 +135,21 @@ cdef class TriMesh:
 
         gim_trimesh_set_tranform(&self._trimesh, <mat4f>&matrix[0, 0])
         gim_trimesh_update(&self._trimesh)
-    
+
+    @property
+    def aabb_set(self):
+        if self._aabb_set is None:
+            self._trimesh.m_aabbset.m_shared = 1
+            aabb_set = AABBSet(0, flag=__create_uninitialized__)
+            aabb_set._aabb_set = self._trimesh.m_aabbset
+            self._aabb_set = aabb_set
+
+        return self._aabb_set
+
+    @property
+    def bounds(self):
+        return self.aabb_set.global_bounds
+
     def clone(self):
         """Returns a  clone of the trimesh.
         

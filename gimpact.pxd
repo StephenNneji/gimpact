@@ -53,6 +53,9 @@ cdef extern from "GIMPACT/gim_memory.h":
         G_BUFFER_MANAGER_SHARED,
         G_BUFFER_MANAGER__MAX   
     
+    cdef struct GBUFFER_ARRAY:
+        pass
+
     cdef struct GBUFFER_MANAGER_DATA:
         pass
     
@@ -112,9 +115,21 @@ cdef extern from "GIMPACT/gim_tri_capsule_collision.h":
         vec3f m_point2
 
 
-cdef extern from "GIMPACT/gim_trimesh.h":   
+cdef extern from "GIMPACT/gim_trimesh.h": 
+    cdef struct GIM_TRIMESH
+    
+    ctypedef void* (*gim_update_trimesh_function)(GIM_TRIMESH _trimesh)
+   
     cdef struct GIM_TRIMESH:
-        pass
+        GBUFFER_ARRAY m_source_vertex_buffer
+        GBUFFER_ARRAY m_tri_index_buffer
+        char m_mask
+        GBUFFER_ARRAY m_transformed_vertex_buffer
+        GIM_AABB_SET m_aabbset
+        GDYNAMIC_ARRAY m_planes_cache_buffer
+        GDYNAMIC_ARRAY m_planes_cache_bitset
+        gim_update_trimesh_function * m_update_callback
+        mat4f m_transform
 
     void GIM_CREATE_TRIMESHPLANE_CONTACTS(GDYNAMIC_ARRAY contact_array)
     
