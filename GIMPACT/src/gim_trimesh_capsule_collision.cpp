@@ -49,7 +49,7 @@ void gim_closest_point_triangle_segment(GIM_TRIANGLE_DATA * triangle, vec3f s1,v
     dis = DISTANCE_PLANE_POINT(triangle->m_planes.m_planes[0],s1);
     dis_temp = DISTANCE_PLANE_POINT(triangle->m_planes.m_planes[0],s2);
 
-    if(dis<=0.0f && dis_temp<=0.0f) return;
+    // if(dis<=0.0f && dis_temp<=0.0f) return;
 
     VEC_DIFF(sdiff,s2,s1);
     perpend = VEC_DOT(sdiff,triangle->m_planes.m_planes[0]);
@@ -221,7 +221,7 @@ Find the closest primitive collided by the ray
 \param contact
 \param contacts A GIM_CONTACT array. Must be initialized
 */
-void gim_trimesh_capsule_collision(GIM_TRIMESH * trimesh, GIM_CAPSULE_DATA * capsule, GDYNAMIC_ARRAY * contacts)
+void gim_trimesh_capsule_collision(GIM_TRIMESH * trimesh, GIM_CAPSULE_DATA * capsule, GDYNAMIC_ARRAY * contacts, char mode)
 {
     contacts->m_size = 0;
 
@@ -236,6 +236,7 @@ void gim_trimesh_capsule_collision(GIM_TRIMESH * trimesh, GIM_CAPSULE_DATA * cap
 	if(collision_result.m_size==0)
 	{
 	    GIM_DYNARRAY_DESTROY(collision_result);
+        return;
 	}
 
 	//collide triangles
@@ -270,6 +271,7 @@ void gim_trimesh_capsule_collision(GIM_TRIMESH * trimesh, GIM_CAPSULE_DATA * cap
                 pcontact++;
                 old_contact_size++;
             }
+            if (mode==1) break;
 		}
 	}
 	///unlocks

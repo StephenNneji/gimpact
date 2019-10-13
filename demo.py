@@ -94,18 +94,18 @@ for i in range(trimesh2.triangle_count):
     print(trimesh2.triangle(i))
 
 contacts = gimpact.trimesh_trimesh_collision(trimesh1, trimesh2)
-contacts = gimpact.trimesh_sphere_collision(trimesh1, np.array([0., 0., 0.], np.float32), 1)
-contacts = gimpact.trimesh_capsule_collision(trimesh1, np.array([-1., 0., 0.], np.float32), np.array([1., 0., 0.], np.float32), 1)
-contacts = gimpact.trimesh_plane_collision(trimesh1, np.array([0., 0., 0., 0.], np.float32))
-for c in contacts:
-   print(*c)
+contacts = gimpact.trimesh_sphere_collision(trimesh1, np.array([0., 0., 0.]), 1, True)
+contacts = gimpact.trimesh_capsule_collision(trimesh1, np.array([0., 0., 0.]), np.array([1., 0., 0.]), 1, True)
+contacts = gimpact.trimesh_plane_collision(trimesh1, np.array([0., 0., 1., 0.]), True)
+#for c in contacts:
+#   print(*c)
 
 contact = gimpact.trimesh_ray_collision(trimesh2, [0., 0., 0.], [-1., 0., 0.], 1000)
-print('\n', contact)
+#print('\n', contact)
 
 
-contact = gimpact.trimesh_ray_closest_collision(trimesh2, np.array([0., 0., 0.], np.float32), np.array([-1., 0., 0.], np.float32), 1000)
-print('\n', contact)
+contact = gimpact.trimesh_ray_closest_collision(trimesh2, np.array([0., 0., 0.]), np.array([-1., 0., 0.]), 1000)
+#print('\n', contact)
 
 t = trimesh.clone()
-print(t.triangle_count)
+#print(t.triangle_count)

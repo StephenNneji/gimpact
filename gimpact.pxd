@@ -159,13 +159,13 @@ cdef extern from "GIMPACT/gim_trimesh.h":
 
     void gim_trimesh_update(GIM_TRIMESH * trimesh)
 
-    void gim_trimesh_trimesh_collision(GIM_TRIMESH * trimesh1, GIM_TRIMESH * trimesh2, GDYNAMIC_ARRAY * contacts)
+    void gim_trimesh_trimesh_collision(GIM_TRIMESH * trimesh1, GIM_TRIMESH * trimesh2, GDYNAMIC_ARRAY * contacts, char mode)
     
-    void gim_trimesh_sphere_collision(GIM_TRIMESH * trimesh,vec3f center,GREAL radius, GDYNAMIC_ARRAY * contacts)
+    void gim_trimesh_sphere_collision(GIM_TRIMESH * trimesh,vec3f center,GREAL radius, GDYNAMIC_ARRAY * contacts, char mode)
     
-    void gim_trimesh_capsule_collision(GIM_TRIMESH * trimesh, GIM_CAPSULE_DATA * capsule, GDYNAMIC_ARRAY * contacts)
+    void gim_trimesh_capsule_collision(GIM_TRIMESH * trimesh, GIM_CAPSULE_DATA * capsule, GDYNAMIC_ARRAY * contacts, char mode)
 
-    void gim_trimesh_plane_collision(GIM_TRIMESH * trimesh, vec4f plane, GDYNAMIC_ARRAY * contacts)
+    void gim_trimesh_plane_collision(GIM_TRIMESH * trimesh, vec4f plane, GDYNAMIC_ARRAY * contacts, char mode)
 
     int gim_trimesh_ray_collision(GIM_TRIMESH * trimesh, vec3f origin, vec3f dir, GREAL tmax, GIM_TRIANGLE_RAY_CONTACT_DATA * contact)
     
@@ -174,5 +174,7 @@ cdef extern from "GIMPACT/gim_trimesh.h":
 
 cdef extern from "Simplify.h" namespace "Simplify":
     void read_mesh(float* vertices, int vertex_count, int* indices, int index_count)
+    
     void simplify_mesh(int target_count, double agressiveness, bool verbose)
+    
     void write_mesh(vector[float]& verts, vector[int]& indices)

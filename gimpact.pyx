@@ -206,6 +206,9 @@ cdef class TriMesh:
                 (v2[0], v2[1], v2[2]))
     
     def decimate(self, int target_count):
+        if target_count >= self.triangle_count:
+            return self
+
         cdef GBUFFER_ARRAY* vertex_buffer = &self._trimesh.m_source_vertex_buffer
         cdef GBUFFER_ARRAY* index_buffer = &self._trimesh.m_tri_index_buffer
         gim_buffer_array_lock(vertex_buffer, 1)
@@ -231,13 +234,15 @@ cdef class TriMesh:
         return PyLong_FromVoidPtr(<void*>&self._trimesh)
 
 
-def trimesh_trimesh_collision(trimesh1, trimesh2):
-    """Determines contacts of a trimesh-trimesh collision
+def trimesh_trimesh_collision(trimesh1, trimesh2, bool first_only=False):
+    """Determines contacts of a trimesh-trimesh collision. 
     
     :param trimesh1: first triangle mesh
     :type trimesh1: Trimesh
     :param trimesh2: second triangle mesh
     :type trimesh2: Trimesh
+    :param first_only: flag that indicates only first contact is required
+    :type first_only: bool
     :return: a list of Contacts
     :rtype: List[Contact]
     """
@@ -247,12 +252,13 @@ def trimesh_trimesh_collision(trimesh1, trimesh2):
 
     cdef object id1 = trimesh1._id()
     cdef object id2 = trimesh2._id()
-    gim_trimesh_trimesh_collision(<GIM_TRIMESH*>PyLong_AsVoidPtr(id1), <GIM_TRIMESH*>PyLong_AsVoidPtr(id2), &gim_contacts)
+    cdef char mode = 1 if first_only else 0 
+    gim_trimesh_trimesh_collision(<GIM_TRIMESH*>PyLong_AsVoidPtr(id1), <GIM_TRIMESH*>PyLong_AsVoidPtr(id2), &gim_contacts, mode)
        
     return extract_contact_data(gim_contacts)
 
 
-def trimesh_sphere_collision(trimesh, center, float radius):
+def trimesh_sphere_collision(trimesh, center, float radius, bool first_only=False):
     """Determines contacts of a trimesh-sphere collision
     
     :param trimesh: triangle mesh
@@ -261,6 +267,8 @@ def trimesh_sphere_collision(trimesh, center, float radius):
     :type center: Array[float]
     :param radius: radius of the sphere
     :type radius: float
+    :param first_only: flag that indicates only first contact is required
+    :type first_only: bool
     :return: a list of Contacts
     :rtype: List[Contact]
     """
@@ -269,18 +277,21 @@ def trimesh_sphere_collision(trimesh, center, float radius):
 
     cdef object id = trimesh._id()
     cdef vec3f _center = [center[0], center[1], center[2]]
-    gim_trimesh_sphere_collision(<GIM_TRIMESH*>PyLong_AsVoidPtr(id), _center, radius, &gim_contacts)
+    cdef char mode = 1 if first_only else 0 
+    gim_trimesh_sphere_collision(<GIM_TRIMESH*>PyLong_AsVoidPtr(id), _center, radius, &gim_contacts, mode)
        
     return extract_contact_data(gim_contacts)
 
 
-def trimesh_plane_collision(trimesh, plane):
+def trimesh_plane_collision(trimesh, plane, bool first_only=False):
     """Determines contacts of a trimesh-plane collision
     
     :param trimesh: triangle mesh
     :type trimesh: Trimesh
     :param plane: plane parameters (a, b, c, d) in form of ax + by + cz + d = 0
     :type plane: Array[float]
+    :param first_only: flag that indicates only first contact is required
+    :type first_only: bool
     :return: a list of tuples containing point and penetration depth
     :rtype: List[Tuple[Array[float], float]]
     """
@@ -290,7 +301,8 @@ def trimesh_plane_collision(trimesh, plane):
 
     cdef object id = trimesh._id()
     cdef vec4f _plane = [plane[0], plane[1], plane[2], plane[3]]
-    gim_trimesh_plane_collision(<GIM_TRIMESH*>PyLong_AsVoidPtr(id), _plane,  &gim_contacts)
+    cdef char mode = 1 if first_only else 0 
+    gim_trimesh_plane_collision(<GIM_TRIMESH*>PyLong_AsVoidPtr(id), _plane,  &gim_contacts, mode)
     contacts = []
     
     cdef int count = gim_contacts.m_size
@@ -305,7 +317,7 @@ def trimesh_plane_collision(trimesh, plane):
     return contacts
 
 
-def trimesh_capsule_collision(trimesh, point1, point2, float radius):
+def trimesh_capsule_collision(trimesh, point1, point2, float radius, bool first_only=False):
     """Determines contacts of a trimesh-capsule collision
     
     :param trimesh: triangle mesh
@@ -316,6 +328,8 @@ def trimesh_capsule_collision(trimesh, point1, point2, float radius):
     :type point2: Array[float]
     :param radius: radius of the sphere
     :type radius: float
+    :param first_only: flag that indicates only first contact is required
+    :type first_only: bool
     :return: a list of Contacts
     :rtype: List[Contact]
     """
@@ -327,10 +341,13 @@ def trimesh_capsule_collision(trimesh, point1, point2, float radius):
     capsule.m_radius = radius
     capsule.m_point1 = [point1[0], point1[1], point1[2]]
     capsule.m_point2 = [point2[0], point2[1], point2[2]]
-    
-    gim_trimesh_capsule_collision(<GIM_TRIMESH*>PyLong_AsVoidPtr(id), &capsule, &gim_contacts)
-       
-    return extract_contact_data(gim_contacts)
+    cdef char mode = 1 if first_only else 0 
+    gim_trimesh_capsule_collision(<GIM_TRIMESH*>PyLong_AsVoidPtr(id), &capsule, &gim_contacts, mode)
+
+
+    result = extract_contact_data(gim_contacts)
+
+    return result[:1] if first_only else result
 
 
 def trimesh_ray_collision(trimesh, origin, direction, float tmax):
@@ -425,8 +442,8 @@ class Contact:
         self.feature2 = feature2
     
     def __str__(self):
-        return (f'Contact:\n\tpoint: {self.point}\n\tnormal: {self.normal}\n\tdepth: {self.depth}'
-                f'\n\tfeature1: {self.feature1}, \n\tfeature2: {self.feature2}')
+        return (f'Contact: point: {self.point}, normal: {self.normal}, depth: {self.depth}, '
+                f'feature1: {self.feature1}, feature2: {self.feature2}')
 
     def __repr__(self):
         return str(self)

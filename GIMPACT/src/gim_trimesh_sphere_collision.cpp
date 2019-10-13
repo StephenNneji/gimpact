@@ -138,7 +138,7 @@ In each contact
 \param radius
 \param contacts A GIM_CONTACT array. Must be initialized
 */
-void gim_trimesh_sphere_collision(GIM_TRIMESH * trimesh,vec3f center,GREAL radius, GDYNAMIC_ARRAY * contacts)
+void gim_trimesh_sphere_collision(GIM_TRIMESH * trimesh,vec3f center,GREAL radius, GDYNAMIC_ARRAY * contacts, char mode)
 {
     contacts->m_size = 0;
 
@@ -158,6 +158,7 @@ void gim_trimesh_sphere_collision(GIM_TRIMESH * trimesh,vec3f center,GREAL radiu
 	if(collision_result.m_size==0)
 	{
 	    GIM_DYNARRAY_DESTROY(collision_result);
+        return;  // no collision
 	}
 
 	//collide triangles
@@ -180,8 +181,10 @@ void gim_trimesh_sphere_collision(GIM_TRIMESH * trimesh,vec3f center,GREAL radiu
 		if(cresult!=0)
 		{
 		    GIM_PUSH_CONTACT(dummycontacts, tri_contact_data.m_points[0],tri_contact_data.m_separating_normal ,tri_contact_data.m_penetration_depth,trimesh, 0, boxesresult[i],0);
-		}
-	}
+            if(mode == 1)  break;
+	    }
+    }
+        
 	///unlocks
 	gim_trimesh_unlocks_work_data(trimesh);
 	///Destroy box result

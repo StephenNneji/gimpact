@@ -1,7 +1,7 @@
 #ifndef GIM_TRIMESH_H_INCLUDED
 #define GIM_TRIMESH_H_INCLUDED
 /*! \file gim_trimesh.h
-\author Francisco León
+\author Francisco Leï¿½n
 */
 /*
 -----------------------------------------------------------------------------
@@ -329,7 +329,7 @@ In each contact
 \param trimesh2 Collidee
 \param contacts A GIM_CONTACT array. Must be initialized
 */
-void gim_trimesh_trimesh_collision(GIM_TRIMESH * trimesh1, GIM_TRIMESH * trimesh2, GDYNAMIC_ARRAY * contacts);
+void gim_trimesh_trimesh_collision(GIM_TRIMESH * trimesh1, GIM_TRIMESH * trimesh2, GDYNAMIC_ARRAY * contacts, char mode);
 
 
 //! Trimesh Sphere Collisions
@@ -388,7 +388,7 @@ In each contact
 \param radius
 \param contacts A GIM_CONTACT array. Must be initialized
 */
-void gim_trimesh_sphere_collision(GIM_TRIMESH * trimesh,vec3f center,GREAL radius, GDYNAMIC_ARRAY * contacts);
+void gim_trimesh_sphere_collision(GIM_TRIMESH * trimesh,vec3f center,GREAL radius, GDYNAMIC_ARRAY * contacts, char mode);
 
 
 //! Trimesh Capsule collision
@@ -448,7 +448,7 @@ In each contact
 \param capsule
 \param contacts A GIM_CONTACT array. Must be initialized
 */
-void gim_trimesh_capsule_collision(GIM_TRIMESH * trimesh, GIM_CAPSULE_DATA * capsule, GDYNAMIC_ARRAY * contacts);
+void gim_trimesh_capsule_collision(GIM_TRIMESH * trimesh, GIM_CAPSULE_DATA * capsule, GDYNAMIC_ARRAY * contacts, char mode);
 
 
 ///Function for create Trimesh Plane  collision result
@@ -510,7 +510,7 @@ In each contact the 3 first coordinates refers to the contact point, the fourth 
 \param plane vec4f plane
 \param contacts A vec4f array. Must be initialized (~100). Each element have the coordinate point in the first 3 elements, and vec4f[3] has the penetration depth.
 */
-void gim_trimesh_plane_collision(GIM_TRIMESH * trimesh,vec4f plane, GDYNAMIC_ARRAY * contacts);
+void gim_trimesh_plane_collision(GIM_TRIMESH * trimesh,vec4f plane, GDYNAMIC_ARRAY * contacts, char mode);
 
 
 //! Trimesh Ray Collisions

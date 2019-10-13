@@ -239,7 +239,7 @@ In each contact
 \param trimesh2 Collidee
 \param contacts A GIM_CONTACT array. Must be initialized
 */
-void gim_trimesh_trimesh_collision(GIM_TRIMESH * trimesh1, GIM_TRIMESH * trimesh2, GDYNAMIC_ARRAY * contacts)
+void gim_trimesh_trimesh_collision(GIM_TRIMESH * trimesh1, GIM_TRIMESH * trimesh2, GDYNAMIC_ARRAY * contacts, char mode)
 {
     contacts->m_size = 0;
     GDYNAMIC_ARRAY collision_pairs;
@@ -287,7 +287,9 @@ void gim_trimesh_trimesh_collision(GIM_TRIMESH * trimesh1, GIM_TRIMESH * trimesh
             for (ci=0;ci<tri_contact_data.m_point_count ;ci++ )
             {
                 GIM_PUSH_CONTACT(dummycontacts, tri_contact_data.m_points[ci],tri_contact_data.m_separating_normal ,tri_contact_data.m_penetration_depth,trimesh1, trimesh2, ti1, ti2);
+                if(mode == 1) break;
             }
+            if(mode == 1)  break;
         }
     }
 
@@ -317,7 +319,7 @@ void gim_trimesh_trimesh_collision(GIM_TRIMESH * trimesh1, GIM_TRIMESH * trimesh
 \param plane vec4f plane
 \param contacts A vec4f array. Must be initialized (~100). Each element have the coordinate point in the first 3 elements, and vec4f[3] has the penetration depth.
 */
-void gim_trimesh_plane_collision(GIM_TRIMESH * trimesh,vec4f plane, GDYNAMIC_ARRAY * contacts)
+void gim_trimesh_plane_collision(GIM_TRIMESH * trimesh,vec4f plane, GDYNAMIC_ARRAY * contacts, char mode)
 {
     contacts->m_size = 0;
     char classify;
@@ -342,6 +344,7 @@ void gim_trimesh_plane_collision(GIM_TRIMESH * trimesh,vec4f plane, GDYNAMIC_ARR
              result_contact = GIM_DYNARRAY_POINTER_LAST(vec4f,(*contacts));
              VEC_COPY((*result_contact),vertices[i]);
              (*result_contact)[3] = -dist;
+             if (mode==1) break;
         }
     }
     gim_trimesh_unlocks_work_data(trimesh);
