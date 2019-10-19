@@ -6,34 +6,218 @@ cimport numpy as np
 cdef object __create_uninitialized__ = object()
 
 
+cdef class AABB:
+    """Represents an axis-aligned bounding boxes (AABB). If the AABB is returned by
+    an AABBSet, the AABB still "belongs to" to that AABBSet, so modifying it will 
+    alter the AABBSet; make a copy of it if you wish to modify it seperately.
+    
+    :param min_x: minimum of x axis
+    :type min_x: float
+    :param max_x: maximum of x axis
+    :type max_x: float
+    :param min_y: minimum of y axis
+    :type min_y: float
+    :param max_y: maximum of y axis
+    :type max_y: float
+    :param min_z: minimum of z axis
+    :type min_z: float
+    :param max_z: maximum of z axis
+    :type max_z: float
+    """
+    cdef object __weakref__
+    cdef aabb3f _aabb
+    cdef aabb3f* _src_aabb
+    cdef GIM_AABB_SET* _aabb_set
+    
+    def __cinit__(self, min_x, max_x, min_y, max_y, min_z, max_z):
+        self._aabb.minX = min_x
+        self._aabb.maxX = max_x
+        self._aabb.minY = min_y
+        self._aabb.maxY = max_y
+        self._aabb.minZ = min_z
+        self._aabb.maxZ = max_z
+        self._aabb_set = NULL
+        self._src_aabb = NULL
+    
+    def __getitem__(self, index):
+        return self.bounds[index]
+
+    def __setitem__(self, index, value):
+        bounds = list(self.bounds)
+        bounds[index] = value
+        self.bounds = bounds
+
+    cdef updateLocalAABB(self):
+        if self._aabb_set is not NULL and self._aabb_set.m_count != 0 and self._src_aabb is not NULL:
+            AABB_COPY(self._aabb, self._src_aabb[0])
+
+    @property
+    def bounds(self):
+        """Bounds of the AABB"""
+        self.updateLocalAABB()            
+        return (self._aabb.minX, self._aabb.maxX, self._aabb.minY, self._aabb.maxY, self._aabb.minZ, self._aabb.maxZ)
+
+    @bounds.setter
+    def bounds(self, value):
+        self._aabb.minX, self._aabb.maxX, self._aabb.minY, self._aabb.maxY, self._aabb.minZ, self._aabb.maxZ = value
+        self.updateAABBSet()
+
+    cdef updateAABBSet(self):
+        if self._aabb_set is not NULL and self._aabb_set.m_count != 0 and self._src_aabb is not NULL:
+            AABB_COPY(self._src_aabb[0], self._aabb)
+            gim_aabbset_update(self._aabb_set)
+        
+    @property
+    def min_x(self):
+        """Minimum x-axis value of the AABB"""
+        return self.__getitem__(0)
+
+    @min_x.setter
+    def min_x(self, value):
+        self.__setitem__(0, value)
+        
+    @property
+    def max_x(self):
+        """Maximum x-axis value of the AABB"""
+        return self.__getitem__(1)
+
+    @max_x.setter
+    def max_x(self, value):
+        self.__setitem__(1, value)
+        
+    @property
+    def min_y(self):
+        """Minimum x-axis value of the AABB"""
+        return self.__getitem__(2)
+
+    @min_y.setter
+    def min_y(self, value):
+        self.__setitem__(2, value)
+        
+    @property
+    def max_y(self):
+        """Maximum y-axis value of the AABB"""
+        return self.__getitem__(3)
+
+    @max_y.setter
+    def max_y(self, value):
+        self.__setitem__(3, value)
+        
+    @property
+    def min_z(self):
+        """Minimum z-axis value of the AABB"""
+        return self.__getitem__(4)
+
+    @min_z.setter
+    def min_z(self, value):
+        self.__setitem__(4, value)  
+        
+    @property
+    def max_z(self):
+        """Maximum z-axis value of the AABB"""
+        return self.__getitem__(5)
+
+    @max_z.setter
+    def max_z(self, value):
+        self.__setitem__(5, value)  
+
+    def intersects(self, aabb):
+        """Checks if the AABB intersects with a given AABB.
+
+        :param aabb: bounding box
+        :type aabb: AABB
+        :return: indicates if the boxes intersect
+        :rtype: bool
+        """
+        cdef char intersected = 0
+        cdef aabb3f* aabb2 = <aabb3f*>PyLong_AsVoidPtr(aabb._id())
+        self.updateLocalAABB()
+        AABBCOLLISION(intersected, self._aabb, aabb2[0]) 
+        return True if intersected == 1 else False
+
+    def intersection(self, aabb):
+        """Finds intersection between the AABB and a given AABB. The resulting 
+        intersection will an invalid bounding box (i.e minimum will be greater 
+        than maximum in the non-overlapping axis) if both boxes do not intersect.
+
+        :param aabb: bounding box
+        :type aabb: AABB
+        :return: intersection of boxes
+        :rtype: AABB
+        """
+        result = AABB(0, 0, 0, 0, 0, 0)
+        cdef aabb3f* aabb2 = <aabb3f*>PyLong_AsVoidPtr(aabb._id())
+        self.updateLocalAABB()
+        BOXINTERSECTION(self._aabb, aabb2[0], result._aabb)
+        return result
+
+    def merge(self, aabb):
+        """Merge the AABB with a given AABB.
+
+        :param aabb: bounding box
+        :type aabb: AABB
+        """ 
+        result = AABB(0, 0, 0, 0, 0, 0)
+        cdef aabb3f* aabb2 = <aabb3f*>PyLong_AsVoidPtr(aabb._id())
+        self.updateLocalAABB() 
+        MERGEBOXES(self._aabb, aabb2[0])
+        self.updateAABBSet()
+
+    def clone(self):
+        self.updateLocalAABB() 
+        return AABB(self._aabb.minX, self._aabb.maxX, self._aabb.minY, self._aabb.maxY, self._aabb.minZ, self._aabb.maxZ)
+
+    def _src_id(self):
+        return PyLong_FromVoidPtr(<void*>self._aabb_set)
+    
+    def _id(self):
+        return PyLong_FromVoidPtr(<void*>&self._aabb)
+
+    def __str__(self):
+        self.updateLocalAABB() 
+        return f'({self._aabb.minX} {self._aabb.maxX} {self._aabb.minY} {self._aabb.maxY} {self._aabb.minZ} {self._aabb.maxZ})'
+    
+    def __repr__(self):
+        cdef aabb3f _aabb = self.updateLocalAABB() 
+        return f'AABB({self._aabb.minX} {self._aabb.maxX} {self._aabb.minY} {self._aabb.maxY} {self._aabb.minZ} {self._aabb.maxZ})'
+
+
 cdef class AABBSet:
     """Represents a collection of axis-aligned bounding boxes (AABBs)
     
     :param count: number of bounding box
     :type count: int
     """
-
+    cdef object __weakref__
     cdef GIM_AABB_SET _aabb_set
     
     def __cinit__(self, int count, flag=None):
         if flag is __create_uninitialized__:
             return
-
-        gim_aabbset_alloc(&self._aabb_set, count)	
+        
+        gim_aabbset_alloc(&self._aabb_set, count)
 
     def __dealloc__(self):
+        self._aabb_set.m_shared = 0
         gim_aabbset_destroy(&self._aabb_set)
 
     def __getitem__(self, index):
         if index < 0 or index >= self._aabb_set.m_count:
             raise IndexError('AABBSet index out of range')
 
-        return AABBSet.aabb3f_to_tuple(self._aabb_set.m_boxes[index])
+        cdef aabb3f* temp = &self._aabb_set.m_boxes[index]
+        aabb = AABB(temp[0].minX, temp[0].maxX, temp[0].minY, temp[0].maxY, temp[0].minZ, temp[0].maxZ)
+        aabb._aabb_set = &self._aabb_set
+        aabb._src_aabb = temp
+        return aabb
 
     def __setitem__(self, index, bounds):
         if index < 0 or index >= self._aabb_set.m_count:
             raise IndexError('AABBSet index out of range')
 
+        if isinstance(bounds, AABB) and bounds._src_id() == self._id():
+            return
+            
         self._aabb_set.m_boxes[index].minX = bounds[0]
         self._aabb_set.m_boxes[index].maxX = bounds[1]
         self._aabb_set.m_boxes[index].minY = bounds[2]
@@ -44,14 +228,13 @@ cdef class AABBSet:
 
     @property
     def global_bounds(self):
-        """Gets an AABB bounding the entire collection
+        """Gets the AABB for the entire collection
 
-        :return: bounds of AABB (min X, max X, min Y, max Y, min Z, max Z)
-        :rtype: Tuple[float, float, float, float, float, float]
+        :return: bounding box of AABBSet
+        :rtype: AABB
         """
-        
-        gim_aabbset_update(&self._aabb_set) 
-        return AABBSet.aabb3f_to_tuple(self._aabb_set.m_global_bound)
+        aabb = self._aabb_set.m_global_bound
+        return AABB(aabb.minX, aabb.maxX, aabb.minY, aabb.maxY, aabb.minZ, aabb.maxZ)
 
     def find_intersections(self, aabb_set):
         """Finds all intersections between this AABBs of this 
@@ -83,10 +266,6 @@ cdef class AABBSet:
 
     def __len__(self):
         return self._aabb_set.m_count
-
-    @staticmethod
-    cdef aabb3f_to_tuple(aabb3f aabb):
-        return (aabb.minX, aabb.maxX, aabb.minY, aabb.maxY, aabb.minZ, aabb.maxZ)
     
     def _id(self):
         return PyLong_FromVoidPtr(<void*>&self._aabb_set)
@@ -102,7 +281,7 @@ cdef class TriMesh:
     :param copy: indicates that data should be copied
     :type copy: bool
     """
-
+    cdef object __weakref__
     cdef GIM_TRIMESH _trimesh
     cdef GBUFFER_MANAGER_DATA buffer_managers[G_BUFFER_MANAGER__MAX]
     cdef object _aabb_set
@@ -164,14 +343,9 @@ cdef class TriMesh:
         :return: trimesh clone
         :rtype: Trimesh
         """
-        cdef GIM_TRIMESH dest_trimesh
-        cdef GBUFFER_MANAGER_DATA buffer_managers[G_BUFFER_MANAGER__MAX]
-        gim_init_buffer_managers(buffer_managers)
-
-        gim_trimesh_copy(&self._trimesh, buffer_managers, &dest_trimesh, 0, 1)
         trimesh = TriMesh(None, None, flag=__create_uninitialized__)
-        trimesh._trimesh = dest_trimesh
-        trimesh.buffer_managers = buffer_managers
+        gim_init_buffer_managers(trimesh.buffer_managers)
+        gim_trimesh_copy(&self._trimesh, trimesh.buffer_managers, &trimesh._trimesh, 0, 1)
         
         return trimesh
     
@@ -447,24 +621,6 @@ class Contact:
 
     def __repr__(self):
         return str(self)
-
-
-def decimate(vertices, indices, int target_count):
-    
-    cdef float[:, ::1] _vertices = np.array(vertices, dtype=np.float32, copy=False, order='C',)
-    cdef int[::1] _indices = np.array(indices, dtype=np.int32, copy=False, order='C',)
-        
-    if np.amin(indices) < 0 or np.amax(indices) >= vertices.shape[0]:
-        raise ValueError("Vertex index out of range")
-    
-    cdef vector[float] v
-    cdef vector[int] i
-    
-    read_mesh(&_vertices[0, 0], _vertices.shape[0], &_indices[0], indices.size)
-    simplify_mesh(target_count, 7, False)
-    write_mesh(v, i)
-    
-    return np.array(v, np.float32).reshape(-1, 3), np.array(i, np.int32)
 
 
 cdef terminate():

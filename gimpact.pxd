@@ -112,6 +112,15 @@ cdef extern from "GIMPACT/gim_boxpruning.h":
     
     void GIM_CREATE_PAIR_SET(GDYNAMIC_ARRAY pair_array)
 
+cdef extern from "GIMPACT/gim_boxpruning.h":
+    void AABB_COPY(aabb3f& dest_aabb, aabb3f& src_aabb)
+    
+    void MERGEBOXES(aabb3f& destaabb, aabb3f& aabb)
+    
+    void BOXINTERSECTION(aabb3f& aabb1, aabb3f& aabb2, aabb3f& iaabb)
+    
+    void AABBCOLLISION(char& intersected, aabb3f& aabb1, aabb3f& aabb2) 
+
 
 cdef extern from "GIMPACT/gim_tri_capsule_collision.h":
     cdef struct GIM_CAPSULE_DATA:

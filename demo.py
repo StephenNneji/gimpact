@@ -44,11 +44,18 @@ def read_binary_stl(filename):
 
 # Testing AABB Set
 
+aabb1 = gimpact.AABB(-1, 1, -1, 1, -1, 1)
+aabb2 = gimpact.AABB(-1, 1, -1, 1, 1.5, 2)
+print(aabb1.intersects(aabb2))
+print(aabb1.intersection(aabb2))
+aabb1.merge(aabb2)
+print(aabb1)
+
 aabb_set = gimpact.AABBSet(10)
 print(len(aabb_set))
 print(aabb_set.global_bounds)
-for i in range(len(aabb_set)):
-    aabb_set[i] = (0., 0., 0., 0., 0., 0.)
+for aabb in aabb_set:
+    aabb.bounds = (0., 0., 0., 0., 0., 0.)
 
 for aabb in aabb_set:
     print(aabb)
@@ -57,6 +64,9 @@ print('\n')
 print(aabb_set.global_bounds)
 pairs = aabb_set.find_intersections(aabb_set)
 print(pairs)
+
+del aabb_set
+print(aabb.bounds)
 
 # Testing Trimesh Class
 
@@ -108,4 +118,7 @@ contact = gimpact.trimesh_ray_closest_collision(trimesh2, np.array([0., 0., 0.])
 #print('\n', contact)
 
 t = trimesh.clone()
-#print(t.triangle_count)
+aabb_set = trimesh.aabb_set
+print(t.triangle_count)
+del t
+print(len(aabb_set))

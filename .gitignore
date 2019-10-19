@@ -15,7 +15,9 @@ htmlcov/
 # Build
 build
 _build
+dist/
 docs/generated
+gimpact.egg-info/
 
 # Cythonize output
 /gimpact.cpp
