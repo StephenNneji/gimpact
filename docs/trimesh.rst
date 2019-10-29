@@ -1,0 +1,3 @@
+TriMesh
+=======
+.. autoclass:: gimpact.TriMesh

@@ -35,6 +35,6 @@ void gimpact_init()
     gim_init_math();
 }
 
-void gimpact_terminate()
-{
-}
+// void gimpact_terminate()
+// {
+// }

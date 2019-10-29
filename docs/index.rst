@@ -1,15 +1,17 @@
 API Reference
 =============
 
-.. autosummary::
-    :toctree: generated
+.. toctree::
+    :maxdepth: 1
 
-    gimpact
+    aabb
+    aabb_set
+    trimesh
+    collision
 
 
 Indices and tables
 ==================
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`

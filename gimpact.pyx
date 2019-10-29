@@ -53,7 +53,7 @@ cdef class AABB:
 
     @property
     def bounds(self):
-        """Bounds of the AABB"""
+        """Gets and Sets Bounds of the AABB as a tuple (min_x, max_x, min_y, max_y, min_z, max_z)"""
         self.updateLocalAABB()            
         return (self._aabb.minX, self._aabb.maxX, self._aabb.minY, self._aabb.maxY, self._aabb.minZ, self._aabb.maxZ)
 
@@ -69,7 +69,7 @@ cdef class AABB:
         
     @property
     def min_x(self):
-        """Minimum x-axis value of the AABB"""
+        """Gets and Sets minimum x-axis value of the AABB"""
         return self.__getitem__(0)
 
     @min_x.setter
@@ -78,7 +78,7 @@ cdef class AABB:
         
     @property
     def max_x(self):
-        """Maximum x-axis value of the AABB"""
+        """Gets and Sets maximum x-axis value of the AABB"""
         return self.__getitem__(1)
 
     @max_x.setter
@@ -87,7 +87,7 @@ cdef class AABB:
         
     @property
     def min_y(self):
-        """Minimum x-axis value of the AABB"""
+        """Gets and Sets minimum x-axis value of the AABB"""
         return self.__getitem__(2)
 
     @min_y.setter
@@ -96,7 +96,7 @@ cdef class AABB:
         
     @property
     def max_y(self):
-        """Maximum y-axis value of the AABB"""
+        """Gets and Sets maximum y-axis value of the AABB"""
         return self.__getitem__(3)
 
     @max_y.setter
@@ -105,7 +105,7 @@ cdef class AABB:
         
     @property
     def min_z(self):
-        """Minimum z-axis value of the AABB"""
+        """Gets and Sets minimum z-axis value of the AABB"""
         return self.__getitem__(4)
 
     @min_z.setter
@@ -114,7 +114,7 @@ cdef class AABB:
         
     @property
     def max_z(self):
-        """Maximum z-axis value of the AABB"""
+        """Gets and Sets maximum z-axis value of the AABB"""
         return self.__getitem__(5)
 
     @max_z.setter
@@ -126,13 +126,14 @@ cdef class AABB:
 
         :param aabb: bounding box
         :type aabb: AABB
-        :return: indicates if the boxes intersect
+        :return: flag indicating if the boxes intersect
         :rtype: bool
         """
         cdef char intersected = 0
-        cdef aabb3f* aabb2 = <aabb3f*>PyLong_AsVoidPtr(aabb._id())
+        cdef aabb3f aabb2
+        aabb2.minX, aabb2.maxX, aabb2.minY, aabb2.maxY, aabb2.minZ, aabb2.maxZ = aabb.bounds
         self.updateLocalAABB()
-        AABBCOLLISION(intersected, self._aabb, aabb2[0]) 
+        AABBCOLLISION(intersected, self._aabb, aabb2) 
         return True if intersected == 1 else False
 
     def intersection(self, aabb):
@@ -146,9 +147,10 @@ cdef class AABB:
         :rtype: AABB
         """
         result = AABB(0, 0, 0, 0, 0, 0)
-        cdef aabb3f* aabb2 = <aabb3f*>PyLong_AsVoidPtr(aabb._id())
+        cdef aabb3f aabb2
+        aabb2.minX, aabb2.maxX, aabb2.minY, aabb2.maxY, aabb2.minZ, aabb2.maxZ = aabb.bounds
         self.updateLocalAABB()
-        BOXINTERSECTION(self._aabb, aabb2[0], result._aabb)
+        BOXINTERSECTION(self._aabb, aabb2, result._aabb)
         return result
 
     def merge(self, aabb):
@@ -158,20 +160,23 @@ cdef class AABB:
         :type aabb: AABB
         """ 
         result = AABB(0, 0, 0, 0, 0, 0)
-        cdef aabb3f* aabb2 = <aabb3f*>PyLong_AsVoidPtr(aabb._id())
+        cdef aabb3f aabb2
+        aabb2.minX, aabb2.maxX, aabb2.minY, aabb2.maxY, aabb2.minZ, aabb2.maxZ = aabb.bounds
         self.updateLocalAABB() 
-        MERGEBOXES(self._aabb, aabb2[0])
+        MERGEBOXES(self._aabb, aabb2)
         self.updateAABBSet()
 
     def clone(self):
+        """clones the AABB.
+        
+        :return: AABB clone
+        :rtype: AABB
+        """
         self.updateLocalAABB() 
         return AABB(self._aabb.minX, self._aabb.maxX, self._aabb.minY, self._aabb.maxY, self._aabb.minZ, self._aabb.maxZ)
 
-    def _src_id(self):
-        return PyLong_FromVoidPtr(<void*>self._aabb_set)
-    
     def _id(self):
-        return PyLong_FromVoidPtr(<void*>&self._aabb)
+        return PyLong_FromVoidPtr(<void*>self._aabb_set)
 
     def __str__(self):
         self.updateLocalAABB() 
@@ -215,7 +220,7 @@ cdef class AABBSet:
         if index < 0 or index >= self._aabb_set.m_count:
             raise IndexError('AABBSet index out of range')
 
-        if isinstance(bounds, AABB) and bounds._src_id() == self._id():
+        if isinstance(bounds, AABB) and bounds._id() == self._id():
             return
             
         self._aabb_set.m_boxes[index].minX = bounds[0]
@@ -278,8 +283,6 @@ cdef class TriMesh:
     :type vertices: Array[float]
     :param indices: array of indices
     :type indices: Array[int]
-    :param copy: indicates that data should be copied
-    :type copy: bool
     """
     cdef object __weakref__
     cdef GIM_TRIMESH _trimesh
@@ -302,43 +305,55 @@ cdef class TriMesh:
         gim_init_buffer_managers(self.buffer_managers)
         gim_trimesh_create_from_data(self.buffer_managers, &self._trimesh, <vec3f*>&_vertices[0, 0],
                                      _vertices.shape[0], 1, <GUINT32*>&_indices[0], _indices.size, 1, 1)
+        self.initAABBSet()
+
+    cdef initAABBSet(self):    
         gim_trimesh_update(&self._trimesh)
 
-        self._aabb_set = None
-
+        self._trimesh.m_aabbset.m_shared = 1
+        aabb_set = AABBSet(0, flag=__create_uninitialized__)
+        aabb_set._aabb_set = self._trimesh.m_aabbset
+        self._aabb_set = aabb_set
+        
     def __dealloc__(self):
         gim_trimesh_destroy(&self._trimesh)
         gim_terminate_buffer_managers(self.buffer_managers)
 
     def transform(self, matrix not None):
+        """Transform triangle mesh in-place with given matrix.
+        
+        :param matrix: 4 x 4 transformation matrix
+        :type matrix: Array[float]
+        """
         cdef float[:, ::1] _matrix = np.array(matrix, dtype=np.float32, copy=False, order='C',)
         if _matrix.shape[0] != 4 or _matrix.shape[1] != 4:
             raise ValueError("Transformation _matrix should have dimension (4, 4)")
 
         gim_trimesh_set_tranform(&self._trimesh, <mat4f>&_matrix[0, 0])
         gim_trimesh_update(&self._trimesh)
+        cdef GIM_AABB_SET* aabb_set = <GIM_AABB_SET*>PyLong_AsVoidPtr(self._aabb_set._id())
+        aabb_set[0].m_global_bound = self._trimesh.m_aabbset.m_global_bound
 
     @property
     def aabb_set(self):
-        if self._aabb_set is None:
-            self._trimesh.m_aabbset.m_shared = 1
-            aabb_set = AABBSet(0, flag=__create_uninitialized__)
-            aabb_set._aabb_set = self._trimesh.m_aabbset
-            self._aabb_set = aabb_set
+        """Gets an AABBSet containing the AABBs of the triangles in trimesh
 
+        :return: AABBSet of Trimesh
+        :rtype: AABBSet
+        """
         return self._aabb_set
 
     @property
     def bounds(self):
         """Gets an AABB bounding the trimesh
 
-        :return: bounds of AABB (min X, max X, min Y, max Y, min Z, max Z)
-        :rtype: Tuple[float, float, float, float, float, float]
+        :return: bounding box of Trimesh
+        :rtype: AABB
         """
-        return self.aabb_set.global_bounds
+        return self._aabb_set.global_bounds
 
     def clone(self):
-        """Returns a  clone of the trimesh.
+        """clones the trimesh.
         
         :return: trimesh clone
         :rtype: Trimesh
@@ -346,6 +361,7 @@ cdef class TriMesh:
         trimesh = TriMesh(None, None, flag=__create_uninitialized__)
         gim_init_buffer_managers(trimesh.buffer_managers)
         gim_trimesh_copy(&self._trimesh, trimesh.buffer_managers, &trimesh._trimesh, 0, 1)
+        trimesh.initAABBSet()
         
         return trimesh
     
@@ -356,7 +372,6 @@ cdef class TriMesh:
         :return: the number of triangles in the TriMesh
         :rtype: int
         """
-
         return gim_trimesh_get_triangle_count(&self._trimesh)
 
     def triangle(self, int idx):
@@ -380,6 +395,14 @@ cdef class TriMesh:
                 (v2[0], v2[1], v2[2]))
     
     def decimate(self, int target_count):
+        """Simplifies mesh to a given target number of faces. Returns the same mesh 
+        if its face count is less than or equal to target_count.
+        
+        :param target_count: target number of faces
+        :type target_count: int
+        :return: simplified trimesh
+        :rtype: Trimesh
+        """
         if target_count >= self.triangle_count:
             return self
 
@@ -458,7 +481,7 @@ def trimesh_sphere_collision(trimesh, center, float radius, bool first_only=Fals
 
 
 def trimesh_plane_collision(trimesh, plane, bool first_only=False):
-    """Determines contacts of a trimesh-plane collision
+    """Determines contacts of a trimesh-plane collision.
     
     :param trimesh: triangle mesh
     :type trimesh: Trimesh
@@ -492,7 +515,7 @@ def trimesh_plane_collision(trimesh, plane, bool first_only=False):
 
 
 def trimesh_capsule_collision(trimesh, point1, point2, float radius, bool first_only=False):
-    """Determines contacts of a trimesh-capsule collision
+    """Determines contacts of a trimesh-capsule collision.
     
     :param trimesh: triangle mesh
     :type trimesh: Trimesh
@@ -525,7 +548,8 @@ def trimesh_capsule_collision(trimesh, point1, point2, float radius, bool first_
 
 
 def trimesh_ray_collision(trimesh, origin, direction, float tmax):
-    """Determines contact of a trimesh-ray collision
+    """Determines contact of a trimesh-ray collision. Collision is considered
+    valid only when the ray collides with the front faces of the trimesh
     
     :param trimesh: triangle mesh
     :type trimesh: Trimesh
@@ -552,7 +576,8 @@ def trimesh_ray_collision(trimesh, origin, direction, float tmax):
 
 
 def trimesh_ray_closest_collision(trimesh, origin, direction, float tmax):
-    """Determines closest contact of a trimesh-ray collision
+    """Determines closest contact of a trimesh-ray collision. Collision is considered
+    valid only when the ray collides with the front faces of the trimesh
     
     :param trimesh: triangle mesh
     :type trimesh: Trimesh
@@ -621,12 +646,6 @@ class Contact:
 
     def __repr__(self):
         return str(self)
-
-
-cdef terminate():
-    """terminate()"""
-
-    gimpact_terminate()
 
 
 cdef initialize():

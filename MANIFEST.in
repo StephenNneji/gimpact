@@ -1,1 +1,5 @@
 include README.md LICENSE
+include gimpact.cpp
+include tests/*.py
+recursive-include GIMPACT *
+exclude *.whl

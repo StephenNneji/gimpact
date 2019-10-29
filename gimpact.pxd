@@ -181,7 +181,7 @@ cdef extern from "GIMPACT/gim_trimesh.h":
     int gim_trimesh_ray_closest_collision(GIM_TRIMESH * trimesh, vec3f origin, vec3f dir, GREAL tmax, GIM_TRIANGLE_RAY_CONTACT_DATA * contact)
 
 
-cdef extern from "Simplify.h" namespace "Simplify":
+cdef extern from "simplify.h" namespace "Simplify":
     void read_mesh(float* vertices, int vertex_count, int* indices, int index_count)
     
     void simplify_mesh(int target_count, double agressiveness, bool verbose)

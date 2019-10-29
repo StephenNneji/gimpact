@@ -78,17 +78,7 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-try:
-    import sphinx_bootstrap_theme
-    html_theme = 'bootstrap'
-    html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
-    html_theme_options = {
-        'bootswatch_theme': "simplex",
-        'navbar_sidebarrel': False,
-        'bootstrap_version': "3",
-    }
-except ImportError:
-    html_theme = 'default'
+html_theme = 'pyramid'
 
 
 # The name for this set of Sphinx documents.  If None, it defaults to

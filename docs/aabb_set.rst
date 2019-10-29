@@ -1,0 +1,3 @@
+AABBSet
+=======
+.. autoclass:: gimpact.AABBSet

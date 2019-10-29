@@ -45,6 +45,7 @@ def read_binary_stl(filename):
 # Testing AABB Set
 
 aabb1 = gimpact.AABB(-1, 1, -1, 1, -1, 1)
+print(aabb1._id())
 aabb2 = gimpact.AABB(-1, 1, -1, 1, 1.5, 2)
 print(aabb1.intersects(aabb2))
 print(aabb1.intersection(aabb2))
@@ -80,7 +81,9 @@ print(trimesh.triangle(0))
 #del mesh
 t = np.identity(4, np.float32)
 t[2, 3] = -1500
+trimesh.bounds
 trimesh.transform(t)
+trimesh.bounds
 print(trimesh.triangle(0))
 v[0, 0] = -1
 print('\n', v[0])
@@ -116,7 +119,7 @@ contact = gimpact.trimesh_ray_collision(trimesh2, [0., 0., 0.], [-1., 0., 0.], 1
 
 contact = gimpact.trimesh_ray_closest_collision(trimesh2, np.array([0., 0., 0.]), np.array([-1., 0., 0.]), 1000)
 #print('\n', contact)
-
+trimesh.aabb_set
 t = trimesh.clone()
 aabb_set = trimesh.aabb_set
 print(t.triangle_count)

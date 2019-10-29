@@ -2,7 +2,7 @@
 #define GIMPACT_H_INCLUDED
 
 /*! \file gimpact.h
-\author Francisco León
+\author Francisco Leï¿½n
 */
 /*
 -----------------------------------------------------------------------------
@@ -40,6 +40,6 @@ email: projectileman@yahoo.com
 //! Call this for initialize GIMPACT system structures.
 void gimpact_init();
 //! Call this for clean GIMPACT system structures.
-void gimpact_terminate();
+//void gimpact_terminate();
 //! @}
 #endif // GIMPACT_H_INCLUDED

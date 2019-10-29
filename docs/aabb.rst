@@ -1,0 +1,3 @@
+AABB
+====
+.. autoclass:: gimpact.AABB
