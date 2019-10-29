@@ -21,11 +21,6 @@ Installation
 ------------
 Build requires numpy and cython (tested on Linux and Windows).
 ``` shell
-python setup.py bdist_wheel
-pip install <package_name>.whl
-```
-
-``` shell
 pip install gimpact
 ```
 
