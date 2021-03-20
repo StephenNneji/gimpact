@@ -1,0 +1,242 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>AABB &#8212; GImpact-Python 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/pyramid.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="AABBSet" href="aabb_set.html" />
+    <link rel="prev" title="API Reference" href="index.html" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Neuton&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nobile:regular,italic,bold,bolditalic&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+
+  </head><body>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="aabb_set.html" title="AABBSet"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="API Reference"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">GImpact-Python 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="aabb">
+<h1>AABB<a class="headerlink" href="#aabb" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="gimpact.AABB">
+<em class="property">class </em><code class="descclassname">gimpact.</code><code class="descname">AABB</code><a class="headerlink" href="#gimpact.AABB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Represents an axis-aligned bounding boxes (AABB). If the AABB is returned by
+an AABBSet, the AABB still “belongs to” to that AABBSet, so modifying it will 
+alter the AABBSet; make a copy of it if you wish to modify it seperately.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>min_x</strong> (<em>float</em>) – minimum of x axis</li>
+<li><strong>max_x</strong> (<em>float</em>) – maximum of x axis</li>
+<li><strong>min_y</strong> (<em>float</em>) – minimum of y axis</li>
+<li><strong>max_y</strong> (<em>float</em>) – maximum of y axis</li>
+<li><strong>min_z</strong> (<em>float</em>) – minimum of z axis</li>
+<li><strong>max_z</strong> (<em>float</em>) – maximum of z axis</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="gimpact.AABB.bounds">
+<code class="descname">bounds</code><a class="headerlink" href="#gimpact.AABB.bounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets and Sets Bounds of the AABB as a tuple (min_x, max_x, min_y, max_y, min_z, max_z)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gimpact.AABB.clone">
+<code class="descname">clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gimpact.AABB.clone" title="Permalink to this definition">¶</a></dt>
+<dd><p>clones the AABB.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">AABB clone</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="generated/gimpact.html#gimpact.AABB" title="gimpact.AABB">AABB</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gimpact.AABB.intersection">
+<code class="descname">intersection</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gimpact.AABB.intersection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds intersection between the AABB and a given AABB. The resulting 
+intersection will an invalid bounding box (i.e minimum will be greater 
+than maximum in the non-overlapping axis) if both boxes do not intersect.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>aabb</strong> (<a class="reference internal" href="generated/gimpact.html#gimpact.AABB" title="gimpact.AABB"><em>AABB</em></a>) – bounding box</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">intersection of boxes</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="generated/gimpact.html#gimpact.AABB" title="gimpact.AABB">AABB</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gimpact.AABB.intersects">
+<code class="descname">intersects</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gimpact.AABB.intersects" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if the AABB intersects with a given AABB.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>aabb</strong> (<a class="reference internal" href="generated/gimpact.html#gimpact.AABB" title="gimpact.AABB"><em>AABB</em></a>) – bounding box</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">flag indicating if the boxes intersect</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gimpact.AABB.max_x">
+<code class="descname">max_x</code><a class="headerlink" href="#gimpact.AABB.max_x" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets and Sets maximum x-axis value of the AABB</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gimpact.AABB.max_y">
+<code class="descname">max_y</code><a class="headerlink" href="#gimpact.AABB.max_y" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets and Sets maximum y-axis value of the AABB</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gimpact.AABB.max_z">
+<code class="descname">max_z</code><a class="headerlink" href="#gimpact.AABB.max_z" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets and Sets maximum z-axis value of the AABB</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gimpact.AABB.merge">
+<code class="descname">merge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gimpact.AABB.merge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merge the AABB with a given AABB.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>aabb</strong> (<a class="reference internal" href="generated/gimpact.html#gimpact.AABB" title="gimpact.AABB"><em>AABB</em></a>) – bounding box</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gimpact.AABB.min_x">
+<code class="descname">min_x</code><a class="headerlink" href="#gimpact.AABB.min_x" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets and Sets minimum x-axis value of the AABB</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gimpact.AABB.min_y">
+<code class="descname">min_y</code><a class="headerlink" href="#gimpact.AABB.min_y" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets and Sets minimum x-axis value of the AABB</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gimpact.AABB.min_z">
+<code class="descname">min_z</code><a class="headerlink" href="#gimpact.AABB.min_z" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets and Sets minimum z-axis value of the AABB</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">API Reference</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="aabb_set.html"
+                        title="next chapter">AABBSet</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="aabb_set.html" title="AABBSet"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="API Reference"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">GImpact-Python 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019-2021, Stephen Nneji.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+    </div>
+  </body>
+</html>

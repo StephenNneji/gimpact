@@ -1,0 +1,37 @@
+gimpact
+=======
+
+.. automodule:: gimpact
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      initialize
+      terminate
+      trimesh_capsule_collision
+      trimesh_plane_collision
+      trimesh_ray_closest_collision
+      trimesh_ray_collision
+      trimesh_sphere_collision
+      trimesh_trimesh_collision
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      AABBSet
+      Contact
+      TriMesh
+   
+   
+
+   
+   
+   
