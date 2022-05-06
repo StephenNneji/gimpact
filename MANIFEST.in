@@ -1,5 +1,6 @@
 include README.md LICENSE
 include gimpact.cpp gimpact.pyx gimpact.pxd
 include tests/*.py
+include pyproject.toml
 recursive-include GIMPACT *
 exclude *.whl

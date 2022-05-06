@@ -9,7 +9,7 @@ DESCRIPTION = 'An unofficial python extension for the GImpact collision library.
 URL = 'https://github.com/StephenNneji'
 AUTHOR = 'Stephen Nneji'
 EMAIL = 'steve.nneji@gmail.com'
-VERSION = '0.1.0'
+VERSION = '0.1.1'
 
 path=os.path.abspath(os.path.dirname(__file__))
 try:
