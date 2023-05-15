@@ -1,3 +1,32 @@
+[project]
+name = "gimpact"
+version = "1.0.1"
+description = "An unofficial python extension for the GImpact collision library"
+authors = [
+    {name = "Stephen Nneji", email="steve.nneji@gmail.com"}
+]
+license = {file = "LICENSE"}
+readme = "README.md"
+requires-python = ">=3.6"
+
+keywords = ["GImpact", "Trimesh", "Collision detection", "Cython"]
+
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Topic :: Games/Entertainment :: Simulation",
+    "Topic :: Scientific/Engineering :: Physics",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Cython"
+]
+
+
 [build-system]
-requires = ["setuptools", "wheel", "numpy>=1.16.4", "Cython>=0.29.21"]
+requires = ["setuptools", "wheel", "numpy>=1.18.5", "Cython>=0.29.21"]
 build-backend = "setuptools.build_meta"

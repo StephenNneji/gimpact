@@ -16,6 +16,13 @@ Features
     * ray
  * Supports "first contact" or "all contacts" modes
 
+Build Wheel
+-----------
+``` shell
+pip install -q build
+python -m build
+```
+
 
 Installation
 ------------
