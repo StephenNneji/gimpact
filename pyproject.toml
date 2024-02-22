@@ -26,6 +26,8 @@ classifiers = [
     "Programming Language :: Cython"
 ]
 
+[tool.setuptools]
+py-modules = []
 
 [build-system]
 requires = ["setuptools", "wheel", "numpy>=1.18.5", "Cython>=0.29.21"]
