@@ -17,7 +17,7 @@ jobs:
       CIBW_SKIP: 'pp*'
       CIBW_ARCHS: 'auto64'
       CIBW_ARCHS_MACOS: "universal2"
-      CIBW_PROJECT_REQUIRES_PYTHON: '>=3.9'
+      CIBW_PROJECT_REQUIRES_PYTHON: '>=3.11'
     defaults:
       run:
         shell: bash -l {0}
@@ -27,13 +27,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4      
 
-      - name: Set up Python 3.9
+      - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
-          python-version: "3.9"
+          python-version: "3.11"
       - name: Build Wheel
         run: |
-          python -m pip install cibuildwheel==2.16.5
+          python -m pip install cibuildwheel==2.23.3
           python -m cibuildwheel --output-dir wheelhouse
       - uses: actions/upload-artifact@v4
         with:
@@ -41,6 +41,7 @@ jobs:
           path: ./wheelhouse/*.whl
       - name: Run Example
         run: |
+          export PATH="$pythonLocation:$PATH"
           python -m pip install numpy
           python -m pip install --no-index --find-links wheelhouse/ gimpact
           python -m unittest
