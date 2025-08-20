@@ -296,8 +296,8 @@ cdef class TriMesh:
         if vertices is None or indices is None:
             raise ValueError('vertices and indices cannot be None.')     
         
-        cdef float[:, ::1] _vertices = np.array(vertices, dtype=np.float32, copy=False, order='C',)
-        cdef int[::1] _indices = np.array(indices, dtype=np.int32, copy=False, order='C',)
+        cdef float[:, ::1] _vertices = np.asarray(vertices, dtype=np.float32, order='C',)
+        cdef int[::1] _indices = np.asarray(indices, dtype=np.int32, order='C',)
         
         if np.amin(indices) < 0 or np.amax(indices) >= vertices.shape[0]:
             raise ValueError("Vertex index out of range")
@@ -325,7 +325,7 @@ cdef class TriMesh:
         :param matrix: 4 x 4 transformation matrix
         :type matrix: Array[float]
         """
-        cdef float[:, ::1] _matrix = np.array(matrix, dtype=np.float32, copy=False, order='C',)
+        cdef float[:, ::1] _matrix = np.asarray(matrix, dtype=np.float32, order='C',)
         if _matrix.shape[0] != 4 or _matrix.shape[1] != 4:
             raise ValueError("Transformation _matrix should have dimension (4, 4)")
 

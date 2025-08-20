@@ -5,7 +5,8 @@ description = "An unofficial python extension for the GImpact collision library"
 authors = [
     {name = "Stephen Nneji", email="steve.nneji@gmail.com"}
 ]
-license = {file = "LICENSE"}
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
 readme = "README.md"
 requires-python = ">=3.6"
 
@@ -17,11 +18,10 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "Topic :: Games/Entertainment :: Simulation",
     "Topic :: Scientific/Engineering :: Physics",
-    "License :: OSI Approved :: BSD License",
     "Operating System :: Microsoft :: Windows",
     "Operating System :: POSIX",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Cython"
 ]
