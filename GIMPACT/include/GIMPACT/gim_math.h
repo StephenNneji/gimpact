@@ -2,7 +2,7 @@
 #define GIM_MATH_H_INCLUDED
 
 /*! \file gim_math.h
-\author Francisco León
+\author Francisco Leï¿½n
 */
 /*
 -----------------------------------------------------------------------------

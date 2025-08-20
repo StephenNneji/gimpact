@@ -1,4 +1,5 @@
 import os
+import sys
 from setuptools import setup
 from setuptools.command.build_ext import build_ext
 from setuptools.extension import Extension
@@ -19,8 +20,45 @@ except FileNotFoundError:
     long_description = DESCRIPTION
 
 
+# check whether compiler supports a flag
+def has_flag(compiler, flag_name):
+    import tempfile
+
+    from setuptools.errors import CompileError
+
+    with tempfile.NamedTemporaryFile("w", suffix=".cpp") as f:
+        f.write("int main (int argc, char **argv) { return 0; }")
+        try:
+            compiler.compile([f.name], extra_postargs=[flag_name])
+        except CompileError:
+            return False
+    return True
+
+
 class build_ext(build_ext):
+    """A custom build extension for adding compiler-specific options."""
+
+    c_opts = {
+        "msvc": ["/O2", "/EHsc"],
+        "unix": ["-O2", "-std=c++11"],
+    }
+    if sys.platform == "darwin":
+        darwin_opts = ["-stdlib=libc++", "-mmacosx-version-min=10.9", "-ffp-contract=off"]
+        c_opts["unix"] = [*darwin_opts, "-O2"]
+
+
     def build_extensions(self):
+        ct = self.compiler.compiler_type
+        opts = self.c_opts.get(ct, [])
+
+        if ct == "unix":
+            if "-Wstrict-prototypes" in self.compiler.compiler_so:
+                self.compiler.compiler_so.remove("-Wstrict-prototypes")
+
+            opts.append(f'-DVERSION_INFO="{self.distribution.get_version()}"')
+            if has_flag(self.compiler, "-fvisibility=hidden"):
+                opts.append("-fvisibility=hidden")
+        
         import numpy
         try:
             from Cython.Build import cythonize
@@ -38,6 +76,7 @@ class build_ext(build_ext):
                     'GIMPACT/src/gim_trimesh_sphere_collision.cpp', 'GIMPACT/src/gim_trimesh_trimesh_collision.cpp'],
             language='c++',
             include_dirs=['GIMPACT/include', numpy.get_include()],
+            extra_compile_args=opts,
         )
 
         self.distribution.ext_modules[:] = cythonize([modules]) if BUILD_CYTHON else [modules]
@@ -66,12 +105,10 @@ setup(name=NAME,
           'License :: OSI Approved :: BSD License',
           'Operating System :: Microsoft :: Windows',
           'Operating System :: POSIX',
-          'Programming Language :: Python :: 2.7',
-          'Programming Language :: Python :: 3',
-          'Programming Language :: Python :: 3.4',
-          'Programming Language :: Python :: 3.5',
-          'Programming Language :: Python :: 3.6',
-          'Programming Language :: Python :: 3.7',
+          'Programming Language :: Python :: 3.10',
+          'Programming Language :: Python :: 3.11',
+          'Programming Language :: Python :: 3.12',
+          'Programming Language :: Python :: 3.13',
           'Programming Language :: Python :: Implementation :: CPython',
           'Programming Language :: Cython'
       ],
