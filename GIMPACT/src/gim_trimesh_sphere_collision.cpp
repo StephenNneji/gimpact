@@ -196,4 +196,3 @@ void gim_trimesh_sphere_collision(GIM_TRIMESH * trimesh,vec3f center,GREAL radiu
     //Destroy dummy
     GIM_DYNARRAY_DESTROY(dummycontacts);
 }
-

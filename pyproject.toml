@@ -1,6 +1,6 @@
 [project]
 name = "gimpact"
-version = "1.0.1"
+version = "1.0.2"
 description = "An unofficial python extension for the GImpact collision library"
 authors = [
     {name = "Stephen Nneji", email="steve.nneji@gmail.com"}
@@ -20,10 +20,15 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Physics",
     "Operating System :: Microsoft :: Windows",
     "Operating System :: POSIX",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.11",
+    'Programming Language :: Python :: 3.12',
+    'Programming Language :: Python :: 3.13',
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Cython"
+]
+
+dependencies = [
+    "numpy >= 1.18.5",
 ]
 
 [tool.setuptools]

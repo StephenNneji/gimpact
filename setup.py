@@ -10,7 +10,7 @@ DESCRIPTION = 'An unofficial python extension for the GImpact collision library.
 URL = 'https://github.com/StephenNneji'
 AUTHOR = 'Stephen Nneji'
 EMAIL = 'steve.nneji@gmail.com'
-VERSION = '1.0.1'
+VERSION = '1.0.2'
 
 path=os.path.abspath(os.path.dirname(__file__))
 try:
@@ -95,25 +95,10 @@ setup(name=NAME,
       url=URL,
       author=AUTHOR,
       author_email=EMAIL,
-      license='BSD',
-      classifiers=[
-          'Development Status :: 5 - Production/Stable',
-          'Intended Audience :: Developers',
-          'Intended Audience :: Science/Research',
-          'Topic :: Games/Entertainment :: Simulation',
-          'Topic :: Scientific/Engineering :: Physics',
-          'License :: OSI Approved :: BSD License',
-          'Operating System :: Microsoft :: Windows',
-          'Operating System :: POSIX',
-          'Programming Language :: Python :: 3.10',
-          'Programming Language :: Python :: 3.11',
-          'Programming Language :: Python :: 3.12',
-          'Programming Language :: Python :: 3.13',
-          'Programming Language :: Python :: Implementation :: CPython',
-          'Programming Language :: Cython'
-      ],
-      keywords='GImpact, Trimesh, Collision detection, Cython',
       cmdclass={"build_ext": build_ext},
       ext_modules=[Extension("", [])],
+      install_requires=[
+          "numpy >= 1.18.5",
+      ],
       test_suite='tests'
 )
